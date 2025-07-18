@@ -1,0 +1,20 @@
+data_path: data/creditcard.csv
+vae_config_path: config/config.yaml
+vae_model_path: outputs/vae_model.pth
+n_samples: 500
+
+label_column: Class
+test_size: 0.3
+random_state: 42
+
+# Random Forest
+rf_n_estimators: 100
+class_weight: balanced
+
+# Logistic Regression
+lr_solver: liblinear
+lr_max_iter: 1000
+
+# XGBoost
+xgb_n_estimators: 100
+xgb_learning_rate: 0.1
