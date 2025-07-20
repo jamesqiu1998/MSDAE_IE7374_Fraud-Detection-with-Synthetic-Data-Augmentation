@@ -4,37 +4,39 @@ This project aims to improve credit card fraud detection by addressing the extre
 
 ---
 
-## 📚 Final Topic Overview
+## Final Topic Overview
 
-Fraudulent transactions represent a tiny fraction of the dataset (~0.17%). Training models on such imbalanced data leads to poor generalization on minority (fraud) classes. We use a VAE trained solely on fraud samples to generate synthetic fraudulent data, augment the original dataset, and build a more balanced training set for a downstream classifier.
+Fraudulent transactions represent a tiny fraction of the dataset (~0.17%). Training models on such imbalanced data leads to poor generalization on the minority (fraud) class. We use a VAE trained solely on fraud samples to generate synthetic fraudulent data, augment the original dataset, and build a more balanced training set for a downstream classifier.
 
 ---
 
-## 📦 Dataset Description
+## Dataset Description
 
 - **Total Transactions**: 284,806  
 - **Fraudulent Transactions**: 492  
 - **File Size**: ~150 MB  
 - **Format**: CSV (Tabular)  
-- **Source**: Collected in 2013 by Worldline and the ULB Machine Learning Group from European cardholders.  
+- **Source**: Collected in 2013 by Worldline and the ULB Machine Learning Group from European cardholders  
 - **Features**:
-  - Time, Amount
-  - 28 anonymized PCA components (V1–V28)
+  - `Time`, `Amount`
+  - 28 anonymized PCA components (`V1`–`V28`)
 
 The original dataset is extremely imbalanced, which justifies the need for data augmentation using generative models.
 
 ---
 
-## 🔍 Model Selection: Variational Autoencoder (VAE)
+## Model Selection: Variational Autoencoder (VAE)
 
 We selected the **Variational Autoencoder** because:
 
 - It works well with **structured tabular data**, unlike many generative models designed for images or text.
-- It's more stable and easier to train on **small or imbalanced datasets** compared to GANs.
+- It is more stable and easier to train on **small or imbalanced datasets** compared to GANs.
 - It learns general patterns from data, providing a **privacy-friendly** way to synthesize realistic fraud records.
 - Synthetic data helps mitigate class imbalance, giving the classifier **more fraud examples** to learn from.
 
-### 🔧 VAE Architecture
+**Note:** This implementation uses **PyTorch** for building and training the VAE.
+
+### VAE Architecture
 
 The VAE consists of:
 
@@ -45,17 +47,17 @@ By learning the distribution of fraudulent transactions, the VAE is capable of g
 
 ---
 
-## 🧠 Project Workflow
+## Project Workflow
 
-1. **Train VAE** on the 492 fraud samples.
-2. **Generate synthetic fraud data** from the trained VAE.
-3. **Combine** real and synthetic fraud data with the original dataset to reduce class imbalance.
-4. **Train a classifier** (e.g., Random Forest) on the augmented dataset.
-5. **Evaluate** the model on the original dataset using metrics such as precision, recall, and F1-score.
+1. Train VAE on the 492 fraud samples.
+2. Generate synthetic fraud data from the trained VAE.
+3. Combine real and synthetic fraud data with the original dataset to reduce class imbalance.
+4. Train a classifier (e.g., Random Forest) on the augmented dataset.
+5. Evaluate the model on the original dataset using metrics such as precision, recall, and F1-score.
 
 ---
 
-## 📈 Expected Outcomes
+## Expected Outcomes
 
 - A trained VAE capable of producing realistic fraudulent transaction data.
 - An augmented dataset with improved class balance.
@@ -63,7 +65,7 @@ By learning the distribution of fraudulent transactions, the VAE is capable of g
 
 ---
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 1. Clone this repository:
    ```bash
