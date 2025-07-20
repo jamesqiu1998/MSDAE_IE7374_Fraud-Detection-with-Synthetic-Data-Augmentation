@@ -5,7 +5,6 @@ from src.vae import VAE
 from src.data_loader import load_dataset
 
 def generate_synthetic_data(config_path: str, model_path: str, n_samples: int = 500):
-    # Load config
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
@@ -23,7 +22,7 @@ def generate_synthetic_data(config_path: str, model_path: str, n_samples: int = 
         synthetic = model.decode(z).numpy()
 
     # Inverse scale
-    _, scaler, df = load_dataset(config["data_path"], config["batch_size"], return_df=True)
+    _, scaler,_, df = load_dataset(config["data_path"], config["batch_size"], return_df=True)
     synthetic_original = scaler.inverse_transform(synthetic)
     columns = df.drop("Class", axis=1).columns
 

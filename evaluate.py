@@ -9,6 +9,8 @@ from src.model_runner import generate_synthetic_data  # Make sure this path is c
 
 
 def evaluate_with_synthetic_data(config):
+
+
     # Load original dataset
     original_df = pd.read_csv(config["data_path"])
 

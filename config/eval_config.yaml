@@ -1,5 +1,5 @@
-data_path: data/creditcard.csv
-vae_config_path: config/config.yaml
+data_path: ../data/creditcard.csv
+vae_config_path: ../config/config.yaml
 vae_model_path: outputs/vae_model.pth
 n_samples: 500
 
