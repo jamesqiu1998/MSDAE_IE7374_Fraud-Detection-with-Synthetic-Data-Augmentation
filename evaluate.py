@@ -2,14 +2,21 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+import matplotlib.pyplot as plt
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+    roc_curve,
+    auc,
+    precision_recall_curve
+)
 import xgboost as xgb
 import yaml
 from src.model_runner import generate_synthetic_data  # Make sure this path is correct
 
 
 def evaluate_with_synthetic_data(config):
-
 
     # Load original dataset
     original_df = pd.read_csv(config["data_path"])
@@ -23,7 +30,7 @@ def evaluate_with_synthetic_data(config):
 
     # Combine real and synthetic data
     combined_df = pd.concat([original_df, synthetic_df], ignore_index=True)
-    print(f"Combined dataset shape: {combined_df.shape}")
+    print(f" Combined dataset shape: {combined_df.shape}")
 
     # Split features and labels
     X = combined_df.drop(columns=[config["label_column"]])
@@ -31,14 +38,13 @@ def evaluate_with_synthetic_data(config):
 
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
+        X, y,
         test_size=config["test_size"],
         stratify=y,
         random_state=config["random_state"]
     )
 
-    # Initialize classifiers using config
+    # Initialize classifiers
     rf_model = RandomForestClassifier(
         n_estimators=config["rf_n_estimators"],
         random_state=config["random_state"],
@@ -61,16 +67,53 @@ def evaluate_with_synthetic_data(config):
         scale_pos_weight=(y_train == 0).sum() / (y_train == 1).sum()
     )
 
-    # Train classifiers
-    rf_model.fit(X_train, y_train)
-    lr_model.fit(X_train, y_train)
-    xgb_model.fit(X_train, y_train)
+    models = [
+        ("Random Forest", rf_model),
+        ("Logistic Regression", lr_model),
+        ("XGBoost", xgb_model)
+    ]
 
-    # Evaluate
-    for name, model in zip(["Random Forest", "Logistic Regression", "XGBoost"], [rf_model, lr_model, xgb_model]):
+    for name, model in models:
+        print(f"\n Training {name}...")
+        model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-        print(f"\nClassification Report for {name}:")
+
+        # Display classification report
+        print(f"\n Classification Report for {name}:")
         print(classification_report(y_test, y_pred))
+
+        # Confusion Matrix
+        cm = confusion_matrix(y_test, y_pred)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot(cmap="Blues")
+        plt.title(f"{name} - Confusion Matrix")
+        plt.grid(False)
+        plt.show()
+
+        # ROC Curve
+        if hasattr(model, "predict_proba"):
+            y_proba = model.predict_proba(X_test)[:, 1]
+            fpr, tpr, _ = roc_curve(y_test, y_proba)
+            roc_auc = auc(fpr, tpr)
+
+            plt.plot(fpr, tpr, label=f"{name} (AUC = {roc_auc:.2f})")
+            plt.plot([0, 1], [0, 1], linestyle="--", color="gray")
+            plt.title(f"{name} - ROC Curve")
+            plt.xlabel("False Positive Rate")
+            plt.ylabel("True Positive Rate")
+            plt.legend(loc="lower right")
+            plt.grid(True)
+            plt.show()
+
+            # Precision-Recall Curve
+            precision, recall, _ = precision_recall_curve(y_test, y_proba)
+            plt.plot(recall, precision, label=name)
+            plt.title(f"{name} - Precision-Recall Curve")
+            plt.xlabel("Recall")
+            plt.ylabel("Precision")
+            plt.grid(True)
+            plt.legend()
+            plt.show()
 
 
 if __name__ == "__main__":

@@ -24,8 +24,8 @@ def generate_synthetic_data(config_path: str, model_path: str, n_samples: int = 
     # Inverse scale
     _, scaler,_, df = load_dataset(config["data_path"], config["batch_size"], return_df=True)
     synthetic_original = scaler.inverse_transform(synthetic)
-    columns = df.drop("Class", axis=1).columns
+    columns = df.columns
 
     synthetic_df = pd.DataFrame(synthetic_original, columns=columns)
-    synthetic_df["Class"] = 1  # label as fraud
+    synthetic_df["Class"] = 1  # Label as fraud
     return synthetic_df
